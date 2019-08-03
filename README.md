@@ -16,12 +16,12 @@ The experiments can be reproduced by executing just one command. Executing the c
 
 1. Checkout this repo into a a folder <repo_folder>
 2. The experiments can be started with:
- * `python3 <repo_folder>start_experiment kmeans`            (The experiments run for multiple month)
+ * `python3 <repo_folder>/start_experiment.py kmeans`            (The experiments run for multiple month)
    Results will be available in the following files:
    * <repo_folder>/kmeans/output_path_latex/kmeans/*-single.tex
- * `python3 <repo_folder>start_experiment kmeanspp`          (The experiments run for multiple month)
+ * `python3 <repo_folder>/start_experiment.py kmeanspp`          (The experiments run for multiple month)
    * <repo_folder>/kmeanspp/output_path_latex/kmeanspp/*-single.tex
- * `python3 <repo_folder>start_experiment minibatch_kmeans`  (The experiments run for multiple month)
+ * `python3 <repo_folder>/start_experiment.py minibatch_kmeans`  (The experiments run for multiple month)
    * <repo_folder>/minibatch_kmeans/output_path_latex/minibatch_kmeans/*-single.tex
 
 # Results
