@@ -23,7 +23,7 @@ miniconda_executable = join(miniconda_bin_dir, 'conda')
 venvs_folder = join(home, ".phd_exp_virtualenvs")
 phd_exp_conda_env_path = join(venvs_folder, "phd_exp")
 pip_env_executable = join(phd_exp_conda_env_path, 'bin', 'pip')
-python_env_executable = join(diss_conda_env_path, 'bin', 'python')
+python_env_executable = join(phd_exp_conda_env_path, 'bin', 'python')
 directory_of_this_script =  abspath(dirname(__file__))
 dataset_path = join(directory_of_this_script, "datasets")
 
@@ -47,10 +47,7 @@ def download_file_from_url(url, destination):
     from urllib.request import urlretrieve
     urlretrieve(url, destination)
 
-def give_process_priority(pid):
-    os.system("sudo renice -n -20 -p " + str(pid))
-
-def execute_program(cmd, env=None, cwd=None, with_priority=False):
+def execute_program(cmd, env=None, cwd=None, pkill_string=None):
 
     if type(cmd) is list:
         cmd_list = cmd
@@ -59,11 +56,13 @@ def execute_program(cmd, env=None, cwd=None, with_priority=False):
 
     print("Executing \"%s\"" % " ".join(cmd_list))
     x = Popen(cmd_list, env=env, cwd=cwd)
-    if with_priority:
-        print("Setting priority of program \"%s\" to maximum. (Might require sudo)" % " ".join(cmd_list))
-        give_process_priority(x.pid)
-    
-    x.wait()
+    try:
+        x.wait()
+    except KeyboardInterrupt:
+        if pkill_string is not None:
+            execute_program("pkill -9 -f %s" % pkill_string)
+            print("Killed by user request: %s" % cmd)
+            return
     if x.returncode != 0:
         raise Exception("Error while executing %s. Returncode %d" % (str(cmd_list), x.returncode))
 
@@ -115,32 +114,20 @@ def check_expected_args(args_dict, expected_arg_list):
         if el not in args_dict:
             raise Exception("Expected argument %s not in args_dict" % str(el))
 
-"""
-  parser.add_argument('--dataset_folder', type=str, default="datasets", help='Path datasets are downloaded to')
-  parser.add_argument('--output_path', type=str, default="output_path", help='Path to the results of single algorithm executions')
-  parser.add_argument('--output_path_latex', type=str, default="output_path_latex", help='Path to the results as latex tables')
-  parser.add_argument('--output_path_latex_append_folder', type=str, default="bestparams")
-  parser.add_argument('--only_result_evaluation', dest='only_evaluation', action='store_true',
-                      help='Recreate latex tables based on previous results without executing kmeans again')
-  parser.add_argument('--testmode', dest='testmode', action='store_true', help='Only run the experiments for a single small dataset')
-  parser.set_defaults(only_evaluation=False)
-  parser.set_defaults(testmode=False)
-  
-"""
-
-
 def execute_experiment(args):
     install_phd_exp_conda_environment()
-    create_folders(dataset_path)
 
     print("Executing experiments for %s")
-    experiments_script = join(directory_of_this_script, args["exp_type"], "do_experiments.py")
+    experiments_path = join(directory_of_this_script, args["exp_type"])
+    experiments_script = join(experiments_path, "do_experiments.py")
     execute_program("%s %s %s %s %s %s" % (python_env_executable,
                                      experiments_script,
                                      "--dataset_folder",
-                                     dataset_path
-                                     "--testmode" if args["testmode"] else "",
-                                     "--only_result_evaluation" if args["only_result_evaluation"] else ""))
+                                     dataset_path,
+                                     "--testmode" if args.get("testmode", False) else "",
+                                     "--only_result_evaluation" if args.get("only_result_evaluation", False) else ""),
+                    cwd=experiments_path,
+                    pkill_string="/%s/do_experiments.py" % args["exp_type"])
 
 def create_subparser(subparsers, command_name, command_data):
     p = subparsers.add_parser(command_name, help=command_data.get('help', ''))
@@ -171,14 +158,13 @@ def execute_chosen_environment(parsed_args, command_data):
     command_data.get('method')(args)
 
 def uninstall(args):
-    if isdir(phd_exp_conda_env_path):
-        shutil.rmtree(phd_exp_conda_env_path)
-    
-    if isdir(venvs_folder):
-        shutil.rmtree(venvs_folder)
+    for folder in [venvs_folder, miniconda_install_dir]:
+        if isdir(folder):
+            print("Deleting %s" % folder)
+            shutil.rmtree(folder)
 
 def main():
-    parser = argparse.ArgumentParser(prog='PROG')
+    parser = argparse.ArgumentParser(prog='start_experiment', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=30, width=120))
     subparsers = parser.add_subparsers(help='sub-command help', dest='subparser_name')
 
     algorithms = ["kmeans", "kmeanspp", "minibatch_kmeans"]
@@ -194,12 +180,23 @@ def main():
 
         opts[alg + "_mini"] = {'method': execute_experiment,
                                'args': {"exp_type": alg, "testmode": True},
-                               'help': 'Execute the %s experiments. (This can take multiple weeks/month)' % alg}
+                               'help': 'Execute the %s experiments on one small dataset (usps)' % alg}
+
+        opts[alg + "_result"] = {'method': execute_experiment,
+                               'args': {"exp_type": alg, "only_result_evaluation": True},
+                               'help': 'Recreate the latex result files from %s experiments.' % alg}
 
     for command in opts:
         create_subparser(subparsers, command, opts[command])
 
     parsed_args = parser.parse_args()
+    
+    try:
+        opts[parsed_args.subparser_name]
+    except:
+        parser.print_help()
+        return
+
     execute_chosen_environment(parsed_args, opts[parsed_args.subparser_name])
 
 if __name__ == "__main__":

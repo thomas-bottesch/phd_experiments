@@ -28,6 +28,9 @@ general_plot_template = \
 \\usepackage{{capt-of}}
 \\usepackage{{currfile}}
 
+%% Comparisons are made between primary and secondary algorithm which can be one of:
+%% - bvelkan, bvyinyang, bvkmeans, elkan, kmeans, pcaelkan, pcayinyang, pcakmeans, yinyang
+
 \\def\\primaryalg{{elkan}}
 \\def\\secondaryalg{{yinyang}}
 
@@ -358,7 +361,7 @@ def create_iteration_duration_plot(output_folder=None,
                 b=None,
                 t=None):
      
-    pname = "tbl-iteration-duration"
+    pname = "plot-iteration-duration"
     py_general_filename_tex = pname + "-single.tex"
     py_sub_filename = pname
     py_sub_filename_tex = pname + ".tex"

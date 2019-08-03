@@ -378,7 +378,7 @@ def create_plot(output_folder=None,
                 only_best_params=False,
                 best_params=None):
      
-    pname = "tbl-param-search"
+    pname = "plot-param-search"
     py_general_filename_tex = pname + "-single.tex"
     py_sub_filename = pname
     py_sub_filename_tex = pname + ".tex"

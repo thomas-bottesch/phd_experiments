@@ -189,7 +189,7 @@ if __name__ == "__main__":
   parser.add_argument('--dataset_folder', type=str, default="datasets", help='Path datasets are downloaded to')
   parser.add_argument('--output_path', type=str, default="output_path", help='Path to the results of single algorithm executions')
   parser.add_argument('--output_path_latex', type=str, default="output_path_latex", help='Path to the results as latex tables')
-  parser.add_argument('--output_path_latex_append_folder', type=str, default="minibatchkmeans")
+  parser.add_argument('--output_path_latex_append_folder', type=str, default="minibatch_kmeans")
   parser.add_argument('--only_result_evaluation', dest='only_evaluation', action='store_true',
                       help='Recreate latex tables based on previous results without executing kmeans again')
   parser.add_argument('--testmode', dest='testmode', action='store_true', help='Only run the experiments for a single small dataset')
@@ -216,9 +216,12 @@ if __name__ == "__main__":
     clusters_medium = [100, 500, 5000]
     clusters_small = [100, 250, 1000]
     #clusters_small = [100]
-    truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(2, 42, 2)]
-    truncated_svd_annz_percentage_small = [float(x) / 1000.0 for x in range(2, 20, 2)]
-    bv_annz = [float(x) / 100.0 for x in range(5, 75, 5)]
+    if args.testmode:
+      truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(6, 10, 2)]
+      bv_annz = [float(x) / 100.0 for x in range(25, 35, 5)]
+    else:
+      truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(2, 42, 2)]
+      bv_annz = [float(x) / 100.0 for x in range(5, 75, 5)]
     do_evaluations(load_usps_dataset(ds_folder), 'usps', out_folder, params_general, clusters_small, truncated_svd_annz_percentage, bv_annz)
     if not args.testmode:
       do_evaluations(load_sector_dataset(ds_folder), 'sector', out_folder, params_general, clusters_small, truncated_svd_annz_percentage, bv_annz)
@@ -273,7 +276,7 @@ if __name__ == "__main__":
 tabs = [("speed", TABLE_TYPE_DURATION)]
 for name, table_type in tabs:
   create_table(output_folder=output_path_latex,
-              plot_name="plot-%s-comparison-minibatchkmeans" % name,
+              plot_name="tbl-%s-comparison-minibatchkmeans" % name,
               pdata=copy.deepcopy(result_data),
               best_params=best_params,
               algs_to_display={'pca_minibatch_kmeans': None,

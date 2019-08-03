@@ -213,10 +213,13 @@ if __name__ == "__main__":
     clusters_big = [100, 1000, 10000]
     clusters_medium = [100, 500, 5000]
     clusters_small = [100, 250, 1000]
-    #clusters_small = [100]
-    truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(2, 42, 2)]
-    truncated_svd_annz_percentage_small = [float(x) / 1000.0 for x in range(2, 20, 2)]
-    bv_annz = [float(x) / 100.0 for x in range(5, 75, 5)]
+    
+    if args.testmode:
+      truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(6, 10, 2)]
+      bv_annz = [float(x) / 100.0 for x in range(25, 35, 5)]
+    else:
+      truncated_svd_annz_percentage = [float(x) / 100.0 for x in range(2, 42, 2)]
+      bv_annz = [float(x) / 100.0 for x in range(5, 75, 5)]
     do_evaluations(load_usps_dataset(ds_folder), 'usps', out_folder, params_general, clusters_small, truncated_svd_annz_percentage, bv_annz)
     if not args.testmode:
       do_evaluations(load_sector_dataset(ds_folder), 'sector', out_folder, params_general, clusters_small, truncated_svd_annz_percentage, bv_annz)
@@ -265,7 +268,7 @@ if __name__ == "__main__":
   tabs = [("speed", TABLE_TYPE_DURATION)]
   for name, table_type in tabs:
     create_table(output_folder=output_path_latex,
-                plot_name="plot-%s-comparison-kmeanspp" % name,
+                plot_name="tbl-%s-comparison-kmeanspp" % name,
                 pdata=copy.deepcopy(result_data),
                 best_params=best_params,
                 algs_to_display={'pca_kmeans++': None,
