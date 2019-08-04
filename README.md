@@ -7,9 +7,9 @@ but should also work on other Debian Linux machines.
 The experiments can be reproduced by executing just one command. Executing the command will do the following:
 * Download and install all libraries required to run the tests (This requires installing via apt get using sudo)
 * Download and install miniconda
-* Create the environment to run the test (miniconda environment)
+* Create the miniconda environment to run the test
 * Install specific versions of all required python-dependencies (numpy, sklearn, fcl) in the environment
-* Automatically download the datasets that were used in the PhD experiments
+* Automatically download & extract the datasets that were used in the PhD experiments
 * Set the priority of the process running the experiments to very high (using renice) to lower the probability of other processes interfering with the experiments
 * Execute the experiment for a specific algorithm
 * Create the results as latex files
@@ -39,8 +39,8 @@ when varying their parameter.
 
 For every experiment and datasets the duration for every single iteration is shown in a plot. These
 plots are configurable (in the latex document) by specifying a primary and secondary algorithm. 
-* \def\primaryalg{<algorithm_name>}
-* \def\secondaryalg{<another_algorithm_name>}
+* `\def\primaryalg{<algorithm_name>}`
+* `\def\secondaryalg{<another_algorithm_name>}`
 
 The algorithm names that can be used are specified within the .tex file.
 
