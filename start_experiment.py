@@ -117,6 +117,10 @@ def check_expected_args(args_dict, expected_arg_list):
 def execute_experiment(args):
     install_phd_exp_conda_environment()
 
+    if not args.get("only_result_evaluation", False):
+        print("Changing start_experiment to highest priority. (Requires sudo)")
+        execute_program("sudo renice -n -20 -p %s" % str(os.getpid()))
+
     print("Executing experiments for %s")
     experiments_path = join(directory_of_this_script, args["exp_type"])
     experiments_script = join(experiments_path, "do_experiments.py")
@@ -180,7 +184,7 @@ def main():
 
         opts[alg + "_mini"] = {'method': execute_experiment,
                                'args': {"exp_type": alg, "testmode": True},
-                               'help': 'Execute the %s experiments on one small dataset (usps)' % alg}
+                               'help': 'Used to test if the %s experiments work properly' % alg}
 
         opts[alg + "_result"] = {'method': execute_experiment,
                                'args': {"exp_type": alg, "only_result_evaluation": True},

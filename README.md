@@ -1,15 +1,17 @@
 # PhD Experiments
 This repository provides the means to easily reproduce the experimental results of my PhD thesis.
 
-To reproduce the results a Linux machine is needed. The following procedure was only tested on Ubuntu 18.04
-but should work on other Debian Linux machines.
+To reproduce the results a Linux machine is needed. The following procedure was tested on Ubuntu 18.04
+but should also work on other Debian Linux machines.
 
 The experiments can be reproduced by executing just one command. Executing the command will do the following:
-* Download and install all software required to run the tests (This requires installing via apt get using sudo)
-* Create the environment to run the test
-* Install specific versions of all required dependencies (numpy, sklearn, fcl)
+* Download and install all libraries required to run the tests (This requires installing via apt get using sudo)
+* Download and install miniconda
+* Create the environment to run the test (miniconda environment)
+* Install specific versions of all required python-dependencies (numpy, sklearn, fcl) in the environment
 * Automatically download the datasets that were used in the PhD experiments
-* Execute the experiment
+* Set the priority of the process running the experiments to very high (using renice) to lower the probability of other processes interfering with the experiments
+* Execute the experiment for a specific algorithm
 * Create the results as latex files
 
 # Steps to run the experiments
@@ -26,7 +28,7 @@ The experiments can be reproduced by executing just one command. Executing the c
 
 # Results
 
-The following results are creates as .tex files.
+The following results are created as .tex files.
 
 ## plot-param-search-single.tex
 
@@ -40,7 +42,7 @@ plots are configurable (in the latex document) by specifying a primary and secon
 * \def\primaryalg{<algorithm_name>}
 * \def\secondaryalg{<another_algorithm_name>}
 
-The algorithmnames that can be used are specified within the .tex file.
+The algorithm names that can be used are specified within the .tex file.
 
 ## tbl-speed-comparison-*-single.tex
 
